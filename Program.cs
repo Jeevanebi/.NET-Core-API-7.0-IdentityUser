@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using WebService.API.Data;
 using WebService.API.Repository;
@@ -6,10 +7,14 @@ using WebService.API.Services;
 
 internal class Program
 {
+
+
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+        var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json").Build();
         // Add services to the container.
 
         //builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -22,12 +27,8 @@ internal class Program
 
         builder.Services.AddDbContext<ApplicationDbContext>();
 
-     
-
-        builder.Services.AddScoped<IAuthService,AuthService>();
-        builder.Services.AddScoped<IUserService,UserService>();
-        
-
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IUserService, UserService>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -36,7 +37,7 @@ internal class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Web API Service GTS",
+                Title = ".NET-Core-API-7.0-BETA-",
                 Version = "v1"
             });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -58,13 +59,29 @@ internal class Program
             },
             new string[] {}
         }
-    });
+            });
         });
         builder.Services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(option =>
+        {
+            option.SaveToken = true;
+            option.TokenValidationParameters = new TokenValidationParameters
+            {
+                SaveSigninToken = true,
+                ValidateIssuer = true,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = config["Jwt:Issuer"],       // Jwt:Issuer - config value 
+                ValidAudience = config["Jwt:Issuer"],     // Jwt:Issuer - config value 
+                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"])) // Jwt:Key - config value 
+            };
         });
+
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -75,7 +92,9 @@ internal class Program
         }
 
         app.UseHttpsRedirection();
+
         app.UseAuthentication();
+
         app.UseAuthorization();
 
         app.MapControllers();

@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,24 +22,37 @@ namespace WebService.API.Services
             _context = context;
         }
 
-        public User? Authenticate(AuthUser auth)
+        public User Authenticate(AuthUser auth)
         {
 
             //var _user = _context.Users.FindAsync(username);
             //var _password = _context.Users.FindAsync(password);
+            //var currentUser = _context.Users.Find(auth.Email);
 
-            var currentUser = _context.Users.FirstOrDefault(x =>
-               x.Username.ToLower() == auth.UserName.ToLower()
-            && x.Password == auth.Password);
-            //&& x.Email.ToLower() == userLogin.Emailaddress.ToLower()
+            //if (currentUser != null)
+            //{
+            //    if(currentUser.Username == auth.UserName && currentUser.Email == auth.Email)
+            //    {
+            //        return currentUser;
+            //    }
+            //}
+            //return null;
 
+            if (string.IsNullOrEmpty(auth.UserName) || string.IsNullOrEmpty(auth.Email) || string.IsNullOrEmpty(auth.Password))
+                return null;
 
-            if (currentUser != null)
-            {
-                return currentUser;
-            }
+            var user = _context.Users.SingleOrDefault(x => x.Email == auth.Email);
 
-            return null;
+            // check if username exists
+            if (user == null)
+                return null;
+
+            //// check if password is correct
+            //if (!VerifyPasswordHash(auth.Password, user.PasswordHash, user.PasswordSalt))
+            //    return null;
+
+            // authentication successful
+            return user;
         }
 
         public string Generate(User user)
@@ -49,7 +64,7 @@ namespace WebService.API.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Username),
                 new Claim(ClaimTypes.Email, user.Email),
-                //new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],

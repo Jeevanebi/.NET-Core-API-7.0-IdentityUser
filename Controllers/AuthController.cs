@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebService.API.Entity;
 using WebService.API.Models;
@@ -21,6 +22,7 @@ namespace WebService.API.Controllers
             _userservice = userService;
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("Authentication")]
         public IActionResult Post([FromBody] AuthUser authentication)
@@ -45,6 +47,7 @@ namespace WebService.API.Controllers
                     Id = user.Userid,
                     Username = user.Username,
                     Email = user.Email,
+                    Role = user.Role,
                     Phone = user.PhoneNo,
                     Created_at = DateTime.UtcNow,
                     Token = token
@@ -54,6 +57,7 @@ namespace WebService.API.Controllers
             return NotFound("User Not Found");
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
         public IActionResult createUser([FromBody] User user)
