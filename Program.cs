@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using WebService.API.Data;
@@ -26,6 +27,17 @@ internal class Program
         //});
 
         builder.Services.AddDbContext<ApplicationDbContext>();
+
+        builder.Services.AddDbContext<IdentityUserContext>();
+
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequiredLength = 8;
+
+        }).AddEntityFrameworkStores<IdentityUserContext>()
+        .AddDefaultTokenProviders();
 
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();

@@ -24,14 +24,14 @@ namespace WebService.API.Services
         public User PostUser(User create)
         {
             _context.Users.Add(create);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
             return create;
         }
 
         public void DeleteUser(User user)
         {
             _context.Users.Remove(user);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
 
         }
 
