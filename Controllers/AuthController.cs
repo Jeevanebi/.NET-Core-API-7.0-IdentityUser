@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebService.API.Entity;
@@ -15,11 +16,13 @@ namespace WebService.API.Controllers
     {
         private readonly IAuthService _auth;
         private readonly IUserService _userservice;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthService AuthService, IUserService userService)
+        public AuthController(IAuthService AuthService, IUserService userService, IMapper mapper)
         {
             _auth = AuthService;
             _userservice = userService;
+            _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -60,9 +63,10 @@ namespace WebService.API.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
-        public IActionResult createUser([FromBody] User user)
+        public IActionResult createUser([FromBody] RegisterUser user)
         {
-            var createUser = _userservice.PostUser(user);
+            var model = _mapper.Map<User>(user);
+            var createUser = _userservice.PostUser(model);
             return Ok(createUser);
         }
     }

@@ -4,6 +4,7 @@ using WebService.API.Entity;
 using WebService.API.Repository; 
 using Microsoft.EntityFrameworkCore;
 using WebService.API.Models;
+using WebService.API.Helpers;
 
 namespace WebService.API.Services
 {
@@ -21,11 +22,11 @@ namespace WebService.API.Services
         public User GetUserbyId(int id) => _context.Users.Find(id);
 
 
-        public User PostUser(User create)
+        public User PostUser(User createUser)
         {
-            _context.Users.Add(create);
+            _context.Users.Add(createUser);
             _context.SaveChanges();
-            return create;
+            return createUser;
         }
 
         public void DeleteUser(User user)

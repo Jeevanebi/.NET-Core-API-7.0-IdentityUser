@@ -14,7 +14,7 @@ namespace WebService.API.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);
-            optionsBuilder.UseSqlServer("name = DefaultConnection");
+            optionsBuilder.UseSqlServer("name = WebAPIDb");
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {

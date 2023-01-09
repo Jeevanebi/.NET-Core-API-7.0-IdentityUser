@@ -12,8 +12,8 @@ using WebService.API.Data;
 namespace WebService.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230106103331_RoleUpdate")]
-    partial class RoleUpdate
+    [Migration("20230109141007_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

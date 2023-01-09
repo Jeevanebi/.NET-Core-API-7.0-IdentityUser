@@ -26,8 +26,10 @@ internal class Program
         //    options.Password.RequiredLength = 8;
         //});
 
+        //Normal User DbContext For Testing(SQL SERVER)
         builder.Services.AddDbContext<ApplicationDbContext>();
 
+        //Identity User DbContext for Production(SQL SERVER)
         builder.Services.AddDbContext<IdentityUserContext>();
 
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
