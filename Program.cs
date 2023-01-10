@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -17,15 +18,7 @@ internal class Program
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
         // Add services to the container.
-
-        //builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
-        //{
-        //    options.Password.RequireDigit = true;
-        //    options.Password.RequireLowercase = true;
-        //    options.Password.RequireUppercase = true;
-        //    options.Password.RequiredLength = 8;
-        //});
-
+        builder.Services.AddAutoMapper(typeof(Program));
         //Normal User DbContext For Testing(SQL SERVER)
         builder.Services.AddDbContext<ApplicationDbContext>();
 
@@ -40,6 +33,8 @@ internal class Program
 
         }).AddEntityFrameworkStores<IdentityUserContext>()
         .AddDefaultTokenProviders();
+        //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();

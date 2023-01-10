@@ -8,8 +8,9 @@ namespace WebService.API.Repository
         IEnumerable<User> GetUsers();
         User GetUserbyId(int id);
         void PutUser(int id, UpdateUser user);
-        User PostUser(User create);
+        User PostUser(User create, string Password);
         void DeleteUser(User user);
         public bool IsExist(int id);
+        
     }
 }

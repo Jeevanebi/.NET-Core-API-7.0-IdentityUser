@@ -89,7 +89,7 @@ namespace WebService.API.Controllers
         public IActionResult PostUser([FromBody] RegisterUser user)
         {
             var model = _mapper.Map<User>(user);
-            var createUser = _user.PostUser(model);
+            var createUser = _user.PostUser(model,user.Password);
             return Ok(createUser);
         }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebService.API.Data;
 
@@ -11,9 +12,11 @@ using WebService.API.Data;
 namespace WebService.API.Migrations.IdentityUser
 {
     [DbContext(typeof(IdentityUserContext))]
-    partial class IdentityUserContextModelSnapshot : ModelSnapshot
+    [Migration("20230110101449_password-encryption")]
+    partial class passwordencryption
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

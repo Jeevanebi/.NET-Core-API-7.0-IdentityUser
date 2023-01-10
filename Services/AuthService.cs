@@ -25,18 +25,6 @@ namespace WebService.API.Services
         public User Authenticate(AuthUser auth)
         {
 
-            //var _user = _context.Users.FindAsync(username);
-            //var _password = _context.Users.FindAsync(password);
-            //var currentUser = _context.Users.Find(auth.Email);
-
-            //if (currentUser != null)
-            //{
-            //    if(currentUser.Username == auth.UserName && currentUser.Email == auth.Email)
-            //    {
-            //        return currentUser;
-            //    }
-            //}
-            //return null;
 
             if (string.IsNullOrEmpty(auth.UserName) || string.IsNullOrEmpty(auth.Email) || string.IsNullOrEmpty(auth.Password))
                 return null;
@@ -46,10 +34,9 @@ namespace WebService.API.Services
             // check if username exists
             if (user == null)
                 return null;
-
-            //// check if password is correct
-            //if (!VerifyPasswordHash(auth.Password, user.PasswordHash, user.PasswordSalt))
-            //    return null;
+            // check if password is correct
+            if (!VerifyPasswordHash(auth.Password, user.PasswordHash, user.PasswordSalt))
+                return null;
 
             // authentication successful
             return user;
@@ -73,6 +60,25 @@ namespace WebService.API.Services
                 expires: DateTime.Now.AddMinutes(100),
                 signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private static bool VerifyPasswordHash(string password, byte[] storedHash, byte[] storedSalt)
+        {
+            if (password == null) throw new ArgumentNullException("password");
+            if (string.IsNullOrWhiteSpace(password)) throw new ArgumentException("Value cannot be empty or whitespace only string.", "password");
+            if (storedHash.Length != 64) throw new ArgumentException("Invalid length of password hash (64 bytes expected).", "passwordHash");
+            if (storedSalt.Length != 128) throw new ArgumentException("Invalid length of password salt (128 bytes expected).", "passwordHash");
+
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+                for (int i = 0; i < computedHash.Length; i++)
+                {
+                    if (computedHash[i] != storedHash[i]) return false;
+                }
+            }
+
+            return true;
         }
     }
 }

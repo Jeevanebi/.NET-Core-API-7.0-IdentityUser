@@ -11,7 +11,6 @@ namespace WebService.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _auth;
@@ -66,7 +65,7 @@ namespace WebService.API.Controllers
         public IActionResult createUser([FromBody] RegisterUser user)
         {
             var model = _mapper.Map<User>(user);
-            var createUser = _userservice.PostUser(model);
+            var createUser = _userservice.PostUser(model, user.Password);
             return Ok(createUser);
         }
     }
