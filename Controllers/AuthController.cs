@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebService.API.Entity;
 using WebService.API.Models;
@@ -24,6 +23,7 @@ namespace WebService.API.Controllers
             _mapper = mapper;
         }
 
+
         [AllowAnonymous]
         [HttpPost]
         [Route("Authentication")]
@@ -34,15 +34,6 @@ namespace WebService.API.Controllers
             if (user != null)
             {
                 var token = _auth.Generate(user);
-
-                //if(user.Role == "Admin")
-                //{
-                //    var users = _userservice.GetUserbyId(user.Userid);
-                //}
-                //else if(user.Role == "Guest")
-                //{
-                //    var users = _userservice.PostUser(user);
-                //}
 
                 return Ok(new
                 {

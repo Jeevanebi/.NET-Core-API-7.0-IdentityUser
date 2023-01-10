@@ -17,14 +17,17 @@ internal class Program
         var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
+
         // Add services to the container.
+        //Resgitering AutoMapper
         builder.Services.AddAutoMapper(typeof(Program));
+
         //Normal User DbContext For Testing(SQL SERVER)
         builder.Services.AddDbContext<ApplicationDbContext>();
-
         //Identity User DbContext for Production(SQL SERVER)
         builder.Services.AddDbContext<IdentityUserContext>();
 
+        //Registering Identity 
         builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
         {
             options.Password.RequireDigit = true;
@@ -33,15 +36,16 @@ internal class Program
 
         }).AddEntityFrameworkStores<IdentityUserContext>()
         .AddDefaultTokenProviders();
-        //builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-
+        //Registering Interface
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
+        //Swagger
         builder.Services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo
@@ -70,6 +74,8 @@ internal class Program
         }
             });
         });
+
+        //Auth
         builder.Services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
