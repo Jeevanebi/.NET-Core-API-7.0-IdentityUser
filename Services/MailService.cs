@@ -17,7 +17,7 @@ namespace WebService.API.Services
         {
             var apiKey = _config["SendMailAPIKey"];
             var client = new SendGridClient(apiKey);
-            var from = new EmailAddress("test@authdemo.com", "JWT Auth Demo");
+            var from = new EmailAddress("noreply@gts.com", "API using .Net Core 7.0");
             var to = new EmailAddress(toEmail);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, content, content);
             var response = await client.SendEmailAsync(msg);
