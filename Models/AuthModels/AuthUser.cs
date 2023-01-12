@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebService.API.Models
+namespace WebService.API.Models.AuthModels
 {
-    public class RegisterUser
+    public class AuthUser
     {
         [Required]
         [StringLength(50)]
-        public string Username { get; set; }
-
+        public string? UserName { get; set; }
+        
         [Required]
         [StringLength(50)]
         [EmailAddress]
@@ -16,10 +16,6 @@ namespace WebService.API.Models
         [Required]
         [StringLength(50, MinimumLength = 5)]
         public string Password { get; set; }
-
-        [Required]
-        [StringLength(50, MinimumLength = 5)]
-        public string ConfirmPassword { get; set; }
 
     }
 }

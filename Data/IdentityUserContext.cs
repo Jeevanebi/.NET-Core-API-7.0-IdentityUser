@@ -50,6 +50,6 @@ namespace WebService.API.Data
             });
         }
 
-        public DbSet<User> users { get; set; }
+        public DbSet<User> userManager { get; set; }
     }
 }

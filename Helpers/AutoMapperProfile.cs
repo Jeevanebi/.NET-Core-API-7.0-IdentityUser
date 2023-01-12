@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using WebService.API.Entity;
 using WebService.API.Models;
+using WebService.API.Models.UserModels;
 
 namespace WebService.API.Helpers
 {
@@ -8,9 +9,9 @@ namespace WebService.API.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserModel>();
-            CreateMap<RegisterUser, User>();
-            CreateMap<UpdateUser, User>();
+            CreateMap<User, UserResponseManager>();
+            CreateMap<RegisterUser, UserResponseManager>();
+            CreateMap<UpdateUser, UserResponseManager>();
         }
         
     }

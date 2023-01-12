@@ -1,11 +1,12 @@
-﻿namespace WebService.API.Models
+﻿using System.ComponentModel;
+using WebService.API.Entity;
+
+namespace WebService.API.Models.UserModels
 {
-    public class UserModel
+    public class UpdateUser
     {
-        public int UseridId { get; set; }
         public string? Username { get; set; }
         public string? Email { get; set; }
-        public string? Role { get; set; }
         public string? PhoneNo { get; set; }
     }
 }
