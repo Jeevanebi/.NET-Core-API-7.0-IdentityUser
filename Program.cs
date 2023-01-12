@@ -22,8 +22,8 @@ internal class Program
         //Resgitering AutoMapper
         builder.Services.AddAutoMapper(typeof(Program));
 
-        //Normal User DbContext For Testing(SQL SERVER)
-        builder.Services.AddDbContext<ApplicationDbContext>();
+        ////Normal User DbContext For Testing(SQL SERVER)
+        //builder.Services.AddDbContext<ApplicationDbContext>();
         //Identity User DbContext for Production(SQL SERVER)
         builder.Services.AddDbContext<IdentityUserContext>();
 
@@ -39,7 +39,8 @@ internal class Program
 
         //Registering Interface
         builder.Services.AddScoped<IAuthService, AuthService>();
-        builder.Services.AddScoped<IUserService, UserService>();
+        //builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddTransient<IMailService, MailService>();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -1,16 +1,18 @@
-﻿using WebService.API.Entity;
+﻿using Microsoft.AspNetCore.Identity;
+using WebService.API.Entity;
 using WebService.API.Models;
+using WebService.API.Models.UserModels;
 
 namespace WebService.API.Repository
 {
     public interface IUserService
     {
-        IEnumerable<User> GetUsers();
-        User GetUserbyId(int id);
-        void PutUser(int id, UpdateUser user);
-        User PostUser(User create, string Password);
-        void DeleteUser(User user);
-        public bool IsExist(int id);
+        Task<IEnumerable<User>> GetUsers();
+        Task<User> GetUserbyId(int id);
+        Task<UserResponseManager> RegisterUserAsync(RegisterUser model);
+        Task<UserResponseManager> PutUser(User model);
+        Task<UserResponseManager> DeleteUser(User user);
+        Task<bool> IsExist(int id);
         
     }
 }

@@ -1,25 +1,22 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebService.API.Models
+namespace WebService.API.Models.AuthModels
 {
-    public class RegisterUser
+    public class ResetPasswordModel
     {
         [Required]
-        [StringLength(50)]
-        public string Username { get; set; }
+        public string Token { get; set; }
 
         [Required]
-        [StringLength(50)]
         [EmailAddress]
         public string Email { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 5)]
-        public string Password { get; set; }
+        public string NewPassword { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 5)]
         public string ConfirmPassword { get; set; }
-
     }
 }
