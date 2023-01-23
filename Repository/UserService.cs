@@ -128,32 +128,23 @@ namespace WebService.API.Services
 
         }
 
-        //public Task<UserResponseManager> UpdateUser(UpdateUser create, string Password)
-        //{
-        //    var updateobj = _context.Users.Find(id);
-        //    updateobj.Username = user.Username;
-        //    updateobj.Email = user.Email;
-        //    updateobj.PhoneNo = user.PhoneNo;
-
-        //    _context.SaveChanges();
-        //}
+    
 
         public Task<UserResponseManager> DeleteUser(string id)
         {
-            //_userManager.DeleteAsync(id);
-            //try
-            //{
-            //    _userManager();
-            //    return new UserResponseManager
-            //    {
-            //        IsSuccess = true,
-            //        Message = " User " + id + " removed successfully!"
-            //    };
-            //}
-            //catch
-            //{
-            //    throw;
-            //}
+            try
+            {
+                _userManager.DeleteAsync(id);
+                return new UserResponseManager
+                {
+                    IsSuccess = true,
+                    Message = " User " + id + " removed successfully!"
+                };
+            }
+            catch
+            {
+                throw;
+            }
             return null;
 
         }

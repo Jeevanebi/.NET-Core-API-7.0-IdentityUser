@@ -57,29 +57,14 @@ namespace WebService.API.Controllers
         {
             if (user != null)
             {
-                var udateUser = await _user.GetUserbyId(id);
-                if(udateUser!= null) { 
-                    var putUser = await 
-                //try
-                //{
-                //    _user.PutUser(id, user);
-                //}
-
-
-                //catch (DbUpdateConcurrencyException)
-                //{
-                //    if (!UserExists(id))
-                //    {
-                //        return NotFound("Error Updating the User !");
-                //    }
-                //    else
-                //    {
-                //        throw;
-                //    }
-                //}
+                var updateUser = await _user.GetUserbyId(id);
+                if(updateUser!= null) {
+                    var userUpdated = await _user.UpdateUser(id, user);
+                    return Ok(userUpdated);
                 }
             }
-            return Ok("Success !");
+            return BadRequest();
+            
         }
 
         [AllowAnonymous]
@@ -97,7 +82,7 @@ namespace WebService.API.Controllers
         [HttpDelete("{id}")]
         //[Authorize(Roles = "SuperAdmin")]
 
-        public IActionResult DeleteUser(int id)
+        public IActionResult DeleteUser(string id)
         {
             var user = _user.GetUserbyId(id);
             if (user == null)
@@ -105,7 +90,7 @@ namespace WebService.API.Controllers
                 return NotFound("User Not Found");
             }
 
-            _user.DeleteUser(user);
+            _user.DeleteUser(id);
             return NotFound("User Deleted");
         }
 
