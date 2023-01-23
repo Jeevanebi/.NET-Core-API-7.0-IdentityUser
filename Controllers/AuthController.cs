@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebService.API.Entity;
 using WebService.API.Models;
 using WebService.API.Models.AuthModels;
-using WebService.API.Repository;
 using WebService.API.Services;
 
 namespace WebService.API.Controllers

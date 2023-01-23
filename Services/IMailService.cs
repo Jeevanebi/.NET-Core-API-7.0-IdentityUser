@@ -1,4 +1,4 @@
-﻿namespace WebService.API.Repository
+﻿namespace WebService.API.Services
 {
     public interface IMailService
     {

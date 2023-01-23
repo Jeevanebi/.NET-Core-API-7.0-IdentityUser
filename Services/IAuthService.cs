@@ -3,7 +3,7 @@ using WebService.API.Models;
 using WebService.API.Models.AuthModels;
 using WebService.API.Models.UserModels;
 
-namespace WebService.API.Repository
+namespace WebService.API.Services
 {
     public interface IAuthService
     {

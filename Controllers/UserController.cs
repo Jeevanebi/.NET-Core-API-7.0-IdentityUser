@@ -5,43 +5,42 @@ using Microsoft.EntityFrameworkCore;
 using WebService.API.Data;
 using WebService.API.Entity;
 using WebService.API.Models;
+using WebService.API.Models.UserModels;
 using WebService.API.Repository;
 
 namespace WebService.API.Controllers
 {
-   
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _user;
-        private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public UserController(IUserService userService, ApplicationDbContext context, IMapper mapper)
+        public UserController(IUserService userService, IMapper mapper)
         {
             _user = userService;
-            _context = context;
             _mapper = mapper;
         }
 
         // GET: api/Users
 
         [HttpGet]
-        [Authorize(Roles = "SuperAdmin")]
-        public IActionResult GetUsers() 
+        //[Authorize(Roles = "SuperAdmin")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUsers() 
         {
-            var AllUser = _user.GetUsers();
+            var AllUser = await _user.GetUsers();
             return Ok(AllUser);
         }
-
+        [AllowAnonymous]
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "SuperAdmin, Admin, Agent")]
-        public IActionResult GetUserbyId(int id)
+        //[Authorize(Roles = "SuperAdmin, Admin, Agent")]
+        public async Task<IActionResult> GetUserbyId(string id)
         {
-            var userById = _user.GetUserbyId(id);
+            var userById = await _user.GetUserbyId(id);
 
             if (userById == null)
             {
@@ -51,51 +50,53 @@ namespace WebService.API.Controllers
             return Ok(userById);
         }
 
+        [AllowAnonymous]
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "SuperAdmin, Admin")]
-        public IActionResult PutUser(int id, UpdateUser user)
+        public async Task<IActionResult> PutUser(string id, UpdateUser user)
         {
-            var dbuserid = _context.Users.Find(id);
-            if (id != dbuserid.Userid)
+            if (user != null)
             {
-                return NotFound("Error : Invalid Put Request, User Not Found !");
-            }
+                var udateUser = await _user.GetUserbyId(id);
+                if(udateUser!= null) { 
+                    var putUser = await 
+                //try
+                //{
+                //    _user.PutUser(id, user);
+                //}
 
-            try
-            {
-                _user.PutUser(id, user);
-            }
 
-
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound("Error Updating the User !");
+                //catch (DbUpdateConcurrencyException)
+                //{
+                //    if (!UserExists(id))
+                //    {
+                //        return NotFound("Error Updating the User !");
+                //    }
+                //    else
+                //    {
+                //        throw;
+                //    }
+                //}
                 }
-                else
-                {
-                    throw;
-                }
             }
-
             return Ok("Success !");
         }
 
+        [AllowAnonymous]
         // POST: api/Users
         [HttpPost]
-        [AllowAnonymous]
         public IActionResult PostUser([FromBody] RegisterUser user)
         {
             var model = _mapper.Map<User>(user);
-            var createUser = _user.PostUser(model,user.Password);
+            var createUser = _user.CreateUser(user);
             return Ok(createUser);
         }
 
+        [AllowAnonymous]
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
+
         public IActionResult DeleteUser(int id)
         {
             var user = _user.GetUserbyId(id);
@@ -108,7 +109,7 @@ namespace WebService.API.Controllers
             return NotFound("User Deleted");
         }
 
-        private bool UserExists(int id)
+        private bool UserExists(string id)
         {
             return _user.IsExist(id);
         }

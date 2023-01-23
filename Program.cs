@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -9,12 +8,10 @@ using WebService.API.Services;
 
 internal class Program
 {
-
-
     private static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var config = new ConfigurationBuilder()
+        var _config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json").Build();
 
@@ -39,7 +36,7 @@ internal class Program
 
         //Registering Interface
         builder.Services.AddScoped<IAuthService, AuthService>();
-        //builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddTransient<IMailService, MailService>();
 
         builder.Services.AddControllers();
@@ -91,9 +88,9 @@ internal class Program
                 ValidateAudience = false,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = config["Jwt:Issuer"],       // Jwt:Issuer - config value 
-                ValidAudience = config["Jwt:Issuer"],     // Jwt:Issuer - config value 
-                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(config["Jwt:Key"])) // Jwt:Key - config value 
+                ValidIssuer = _config["Jwt:Issuer"],       // Jwt:Issuer - config value 
+                ValidAudience = _config["Jwt:Issuer"],     // Jwt:Issuer - config value 
+                IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"])) // Jwt:Key - config value 
             };
         });
 

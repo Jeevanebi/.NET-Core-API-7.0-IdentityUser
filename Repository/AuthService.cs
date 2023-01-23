@@ -8,44 +8,47 @@ using System.Text;
 using WebService.API.Models;
 using WebService.API.Models.AuthModels;
 using WebService.API.Models.UserModels;
-using WebService.API.Repository;
+using WebService.API.Services;
 
-namespace WebService.API.Services
+namespace WebService.API.Repository
 {
     public class AuthService : IAuthService
     {
         private readonly IConfiguration _config;
         private UserManager<IdentityUser> _userManger;
         private IMailService _mailService;
+        private readonly IUserService _useService;
 
-        public AuthService(IConfiguration config, UserManager<IdentityUser> userManager, IMailService mailService)
+        public AuthService(IConfiguration config, UserManager<IdentityUser> userManager, IMailService mailService, IUserService userService)
         {
             _config = config;
             _userManger = userManager;
             _mailService = mailService;
+            _useService = userService;
         }
 
         //Register User
         public async Task<UserResponseManager> RegisterUser(RegisterUser model)
         {
-            if (model == null)
-                throw new NullReferenceException("Data provided is NULL");
+            //if (model == null)
+            //    throw new NullReferenceException("Data provided is NULL");
 
-            if (model.Password != model.ConfirmPassword)
-                return new UserResponseManager
-                {
-                    Message = "Confirm password doesn't match the password",
-                    IsSuccess = false,
-                };
+            //if (model.Password != model.ConfirmPassword)
+            //    return new UserResponseManager
+            //    {
+            //        Message = "Confirm password doesn't match the password",
+            //        IsSuccess = false,
+            //    };
             var identityUser = new IdentityUser
             {
                 Email = model.Email,
                 UserName = model.Username,
             };
 
-            var result = await _userManger.CreateAsync(identityUser, model.Password);
+            //var result = await _userManger.CreateAsync(identityUser, model.Password);
+            var createdUser = await _useService.CreateUser(model);  
 
-            if (result.Succeeded)
+            if (createdUser.IsSuccess == true)
             {
                 var confirmEmailToken = await _userManger.GenerateEmailConfirmationTokenAsync(identityUser);
 
@@ -69,7 +72,7 @@ namespace WebService.API.Services
             {
                 Message = "User did not create",
                 IsSuccess = false,
-                Errors = result.Errors.Select(e => e.Description)
+                Errors = createdUser.Errors.Select(e => e.message)
             };
 
         }
@@ -223,7 +226,7 @@ namespace WebService.API.Services
             return tokenString;
         }
 
-       
+
         //Authenticate
 
         //private User Authenticate(AuthUser auth)
