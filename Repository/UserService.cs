@@ -47,7 +47,7 @@ namespace WebService.API.Services
             {
                 var findUser = await GetUserbyId(id);
                 if (findUser != null) {
-
+                   
                     var updateUser = new IdentityUser
                     {
                         UserName = user.Username,
@@ -136,6 +136,7 @@ namespace WebService.API.Services
             try
             {
                await _userManager.DeleteAsync(user);
+                
                 return new UserResponseManager
                 {
                     IsSuccess = true,

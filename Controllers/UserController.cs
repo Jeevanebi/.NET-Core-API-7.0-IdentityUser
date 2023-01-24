@@ -67,8 +67,9 @@ namespace WebService.API.Controllers
             
         }
 
-        [AllowAnonymous]
+
         // POST: api/Users
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
         {
@@ -77,21 +78,22 @@ namespace WebService.API.Controllers
             return Ok(createUser);
         }
 
-        [AllowAnonymous]
+
         // DELETE: api/Users/5
+        [AllowAnonymous]
         [HttpDelete("{id}")]
         //[Authorize(Roles = "SuperAdmin")]
 
-        public IActionResult DeleteUser(string id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = _user.GetUserbyId(id);
+            var user = await _user.GetUserbyId(id);
             if (user == null)
             {
                 return NotFound("User Not Found");
             }
 
-            _user.DeleteUser(id);
-            return NotFound("User Deleted");
+            await _user.DeleteUser(id);
+            return Content("User Deleted");
         }
 
         private bool UserExists(string id)
