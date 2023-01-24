@@ -78,7 +78,6 @@ namespace WebService.API.Controllers
             return Ok(createUser);
         }
 
-
         // DELETE: api/Users/5
         [AllowAnonymous]
         [HttpDelete("{id}")]
