@@ -41,7 +41,7 @@ namespace WebService.API.Services
             };
         }
 
-        public async Task<UserResponseManager> updateUser(string id, UpdateUser user)
+        public async Task<UserResponseManager> UpdateUser(string id, UpdateUser user)
         {
             if (user != null)
             {
@@ -130,11 +130,12 @@ namespace WebService.API.Services
 
     
 
-        public Task<UserResponseManager> DeleteUser(string id)
+        public async Task<UserResponseManager> DeleteUser(string id)
         {
+            IdentityUser user = await _userManager.FindByIdAsync(id);
             try
             {
-                _userManager.DeleteAsync(id);
+               await _userManager.DeleteAsync(user);
                 return new UserResponseManager
                 {
                     IsSuccess = true,
@@ -166,7 +167,6 @@ namespace WebService.API.Services
                 passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
-
     }
 }
 

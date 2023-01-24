@@ -70,10 +70,10 @@ namespace WebService.API.Controllers
         [AllowAnonymous]
         // POST: api/Users
         [HttpPost]
-        public IActionResult PostUser([FromBody] RegisterUser user)
+        public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
         {
-            var model = _mapper.Map<User>(user);
-            var createUser = _user.CreateUser(user);
+            //var model = _mapper.Map<User>(user);
+            var createUser = await  _user.CreateUser(user);
             return Ok(createUser);
         }
 

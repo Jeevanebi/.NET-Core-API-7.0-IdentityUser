@@ -48,17 +48,17 @@ namespace WebService.API.Repository
             //var result = await _userManger.CreateAsync(identityUser, model.Password);
             var createdUser = await _useService.CreateUser(model);  
 
-            if (createdUser.IsSuccess == true)
-            {
-                var confirmEmailToken = await _userManger.GenerateEmailConfirmationTokenAsync(identityUser);
+            //if (createdUser.IsSuccess == true)
+            //{
+            //    var confirmEmailToken = await _userManger.GenerateEmailConfirmationTokenAsync(identityUser);
 
-                var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
-                var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
+            //    var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
+            //    var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
 
-                string url = $"{_config["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
+            //    string url = $"{_config["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
 
-                await _mailService.SendEmailAsync(identityUser.Email, "Confirm your email", $"<h1>Welcome to Test API</h1>" +
-                    $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
+            //    await _mailService.SendEmailAsync(identityUser.Email, "Confirm your email", $"<h1>Welcome to Test API</h1>" +
+            //        $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
 
 
                 return new UserResponseManager
@@ -66,14 +66,14 @@ namespace WebService.API.Repository
                     Message = "User created successfully! Please confirm the your Email!",
                     IsSuccess = true
                 };
-            }
+            //}
 
-            return new UserResponseManager
-            {
-                Message = "User did not create",
-                IsSuccess = false,
-                Errors = createdUser.Errors.Select(e => e.message)
-            };
+            //return new UserResponseManager
+            //{
+            //    Message = "User did not create",
+            //    IsSuccess = false,
+            //    Errors = createdUser.Errors.Select(e => e.message)
+            //};
 
         }
 
