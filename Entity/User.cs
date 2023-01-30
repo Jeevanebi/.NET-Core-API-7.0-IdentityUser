@@ -8,9 +8,9 @@ namespace WebService.API.Entity
 
     public class User : IdentityUser
     {
-        public string UserId { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
-        public string PhoneNo { get; set; }
+        public string? UserId { get; set; }
+        public string? Username { get; set; }
+        public string? Email { get; set; }
+        public string? PhoneNo { get; set; }
     }
 }

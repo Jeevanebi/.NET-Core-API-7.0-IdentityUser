@@ -7,7 +7,6 @@
   </PropertyGroup>
 
     <ItemGroup>
-      <Compile Remove="Controllers\UserController.cs" />
       <Compile Remove="Repository\IUserService.cs" />
       <Compile Remove="Services\UserService.cs" />
     </ItemGroup>
@@ -24,6 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
     <PackageReference Include="SendGrid" Version="9.28.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>

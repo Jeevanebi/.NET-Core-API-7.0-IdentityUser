@@ -2,74 +2,85 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using WebService.API.Helpers;
 using WebService.API.Models;
 using WebService.API.Models.AuthModels;
 using WebService.API.Models.UserModels;
-using WebService.API.Repository;
+using WebService.API.Services;
 
-namespace WebService.API.Services
+namespace WebService.API.Repository
 {
     public class AuthService : IAuthService
     {
         private readonly IConfiguration _config;
-        private UserManager<IdentityUser> _userManger;
+        private UserManager<IdentityUser> _userManager;
+        private RoleManager<IdentityRole> _roleManager;
         private IMailService _mailService;
+        private readonly IUserService _useService;
 
-        public AuthService(IConfiguration config, UserManager<IdentityUser> userManager, IMailService mailService)
+        public AuthService(IConfiguration config,
+                            UserManager<IdentityUser> userManager, 
+                            IMailService mailService, 
+                            IUserService userService,
+                            RoleManager<IdentityRole> roleManager)
         {
             _config = config;
-            _userManger = userManager;
+            _userManager = userManager;
+            _roleManager = roleManager;
             _mailService = mailService;
+            _useService = userService;
         }
 
         //Register User
         public async Task<UserResponseManager> RegisterUser(RegisterUser model)
         {
-            if (model == null)
-                throw new NullReferenceException("Data provided is NULL");
-
-            if (model.Password != model.ConfirmPassword)
-                return new UserResponseManager
-                {
-                    Message = "Confirm password doesn't match the password",
-                    IsSuccess = false,
-                };
+        
             var identityUser = new IdentityUser
             {
                 Email = model.Email,
                 UserName = model.Username,
             };
 
-            var result = await _userManger.CreateAsync(identityUser, model.Password);
+            //user creation
+            var createdUser = await _useService.CreateUser(model);
 
-            if (result.Succeeded)
+            //Mail Sending
+            if (createdUser.IsSuccess != false)
             {
-                var confirmEmailToken = await _userManger.GenerateEmailConfirmationTokenAsync(identityUser);
+                string confirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(identityUser);
 
-                var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
+                var emailToken = Uri.EscapeDataString(confirmEmailToken);
+                var encodedEmailToken = Encoding.UTF8.GetBytes(emailToken);
                 var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
 
-                string url = $"{_config["AppUrl"]}/api/auth/confirmemail?userid={identityUser.Id}&token={validEmailToken}";
+                var confirmUser = await _userManager.FindByEmailAsync(identityUser.Email);
 
-                await _mailService.SendEmailAsync(identityUser.Email, "Confirm your email", $"<h1>Welcome to Test API</h1>" +
-                    $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
+                string url = $"{_config["AppUrl"]}/api/auth/ConfirmEmail?userid={confirmUser.Id}&token={validEmailToken}";
 
+                var mailContent = new MailRequest
+                {
+                    ToEmail = identityUser.Email,
+                    Subject = "Confirm your email",
+                    Body = $"<h1>Welcome to Identity Test API</h1>" + $"<p>Hi {identityUser.UserName} !, Please confirm your email by <a href='{url}'>Clicking here</a></p><br><strong>Email Confirmation token for ID '"+confirmUser.Id+"' : <code>"+validEmailToken + "</code></strong>"
+                };
+
+                await _mailService.SendEmailAsync(mailContent);
 
                 return new UserResponseManager
                 {
+                    IsSuccess = true,
                     Message = "User created successfully! Please confirm the your Email!",
-                    IsSuccess = true
                 };
             }
 
             return new UserResponseManager
             {
-                Message = "User did not create",
                 IsSuccess = false,
-                Errors = result.Errors.Select(e => e.Description)
+                Message = "User Email Already Registered, Try Login(/api/auth/Authenticate)"
             };
 
         }
@@ -77,8 +88,8 @@ namespace WebService.API.Services
         //Login User
         public async Task<UserResponseManager> LoginUser(AuthUser model)
         {
-            var user = await _userManger.FindByEmailAsync(model.Email);
-
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            
             if (user == null)
             {
                 return new UserResponseManager
@@ -87,59 +98,77 @@ namespace WebService.API.Services
                     IsSuccess = false,
                 };
             }
+            else
+            {
+                var result = await _userManager.CheckPasswordAsync(user, model.Password);
+                if (!result)
+                    return new UserResponseManager
+                    {
+                        Message = "Invalid password",
+                        IsSuccess = false,
+                    };
 
-            var result = await _userManger.CheckPasswordAsync(user, model.Password);
-
-            if (!result)
+                var userRole = await _roleManager.FindByIdAsync(user.Id);
+                var Token = GenerateToken(user, "Admin" , user.Id);
                 return new UserResponseManager
                 {
-                    Message = "Invalid password",
-                    IsSuccess = false,
+                    Message = Token,
+                    IsSuccess = true,
                 };
-            var Token = GenerateToken(model, user.Id);
+            }
 
-            return new UserResponseManager
-            {
-                Message = Token,
-                IsSuccess = true,
-                ExpireDate = DateTime.Now.AddHours(24)
-            };
+            //Finding User Role 
+          
+            //var tokenClaims = new
+            //{
+            //    User = user,
+            //    UserRole = userRole
+                
+            //};
         }
 
         //ConfirmEmail
         public async Task<UserResponseManager> ConfirmEmail(string userId, string token)
         {
-            var user = await _userManger.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
+            {
                 return new UserResponseManager
                 {
                     IsSuccess = false,
                     Message = "User not found"
                 };
-            var decodedToken = WebEncoders.Base64UrlDecode(token);
-            string normalToken = Encoding.UTF8.GetString(decodedToken);
+            }
 
-            var result = await _userManger.ConfirmEmailAsync(user, normalToken);
+            var decodedToken = WebEncoders.Base64UrlDecode(token);
+            var normalToken = Encoding.UTF8.GetString(decodedToken);
+
+            var result =  await _userManager.ConfirmEmailAsync(user,normalToken);
 
             if (result.Succeeded)
+            {
+                user.EmailConfirmed = true;
+                await _userManager.UpdateAsync(user);
+
                 return new UserResponseManager
                 {
                     Message = "Email confirmed successfully!",
                     IsSuccess = true,
                 };
+            }
 
             return new UserResponseManager
             {
                 IsSuccess = false,
                 Message = "Email did not confirm",
-                Errors = result.Errors.Select(e => e.Description)
+                //Errors = result.Errors.ToArray()
             };
         }
 
         //Forget Password
         public async Task<UserResponseManager> ForgetPassword(string email)
         {
-            var user = await _userManger.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
                 return new UserResponseManager
                 {
@@ -147,14 +176,21 @@ namespace WebService.API.Services
                     Message = "No user associated with email",
                 };
 
-            var token = await _userManger.GeneratePasswordResetTokenAsync(user);
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var encodedToken = Encoding.UTF8.GetBytes(token);
             var validToken = WebEncoders.Base64UrlEncode(encodedToken);
+            string pass = "Tester@123";
+            string url = $"{_config["AppUrl"]}/api/Auth/ResetPassword?Email={email}&Token={validToken}&NewPassword={pass}&ConfirmPassword={pass}";
+            
+            var mailContent = new MailRequest
+            {
+                ToEmail = email,
+                Subject = "Reset Password",
+                Body = "<h1>Follow the instructions to reset your password</h1>" +
+                $"<p>To reset your password, <br><br> 1. Copy the Link :  <a href='{url}'>{url}</a><br><br> 2. Navigate to API Testing Tools(Postman)<br><br> 3. Set the Method to 'POST' <br><br> 4. Make a Request <br><br> or Use SWAGGER <br><br> <strong>Reset Token : {validToken}</strong></p>"
+            };
 
-            string url = $"{_config["AppUrl"]}/ResetPassword?email={email}&token={validToken}";
-
-            await _mailService.SendEmailAsync(email, "Reset Password", "<h1>Follow the instructions to reset your password</h1>" +
-                $"<p>To reset your password <a href='{url}'>Click here</a></p>");
+            await _mailService.SendEmailAsync(mailContent);
 
             return new UserResponseManager
             {
@@ -166,7 +202,7 @@ namespace WebService.API.Services
         //Reset Password
         public async Task<UserResponseManager> ResetPassword(ResetPasswordModel model)
         {
-            var user = await _userManger.FindByEmailAsync(model.Email);
+            var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
                 return new UserResponseManager
                 {
@@ -184,7 +220,7 @@ namespace WebService.API.Services
             var decodedToken = WebEncoders.Base64UrlDecode(model.Token);
             string normalToken = Encoding.UTF8.GetString(decodedToken);
 
-            var result = await _userManger.ResetPasswordAsync(user, normalToken, model.NewPassword);
+            var result = await _userManager.ResetPasswordAsync(user, normalToken, model.NewPassword);
 
             if (result.Succeeded)
                 return new UserResponseManager
@@ -202,7 +238,7 @@ namespace WebService.API.Services
         }
 
         //Token Genereator
-        private string GenerateToken(AuthUser user, string id)
+        private string GenerateToken(IdentityUser user,string userRole, string id)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -210,7 +246,8 @@ namespace WebService.API.Services
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, id),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, userRole)
             };
 
             var tokenClaims = new JwtSecurityToken(_config["Jwt:Issuer"],
@@ -223,7 +260,7 @@ namespace WebService.API.Services
             return tokenString;
         }
 
-       
+
         //Authenticate
 
         //private User Authenticate(AuthUser auth)
