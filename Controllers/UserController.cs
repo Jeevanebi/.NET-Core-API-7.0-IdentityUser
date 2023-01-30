@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using WebService.API.Models;
 using WebService.API.Models.UserModels;
 using WebService.API.Repository;
+using WebService.API.Services;
 
 namespace WebService.API.Controllers
 {
@@ -14,16 +15,18 @@ namespace WebService.API.Controllers
     {
         private readonly IUserService _user;
         private readonly IMapper _mapper;
+        private readonly IAuthService _auth;
 
-        public UserController(IUserService userService, IMapper mapper)
+        public UserController(IUserService userService, IMapper mapper, IAuthService authService)
         {
             _user = userService;
             _mapper = mapper;
+            _auth = authService;
         }
 
         // GET: api/Users
         [HttpGet]
-        [Authorize(Roles = "SuperAdmin")]
+        //[Authorize(Roles = "SuperAdmin")]
         //[AllowAnonymous]
         public async Task<IActionResult> GetUsers() 
         {
@@ -34,7 +37,7 @@ namespace WebService.API.Controllers
         //[AllowAnonymous]
         // GET: api/Users/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "SuperAdmin, Admin, Agent")]
+        //[Authorize(Roles = "SuperAdmin, Admin, Agent")]
         public async Task<IActionResult> GetUserbyId(string id)
         {
             var userById = await _user.GetUserbyId(id);
@@ -49,7 +52,7 @@ namespace WebService.API.Controllers
 
         //[AllowAnonymous]
         // PUT: api/Users/5
-        [Authorize(Roles = "SuperAdmin, Admin")]
+        //[Authorize(Roles = "SuperAdmin, Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, UpdateUser user)
         {
@@ -71,17 +74,23 @@ namespace WebService.API.Controllers
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
         {
-            //var model = _mapper.Map<User>(user);
-            var createUser = await  _user.CreateUser(user);
-            return Ok(createUser);
+            if (ModelState.IsValid)
+            {
+                var result = await _auth.RegisterUser(user);
+
+                if (result.IsSuccess)
+                    return Ok(result); // Status Code: 200 
+
+                return BadRequest(result);
+            }
+
+            return BadRequest("Some properties are not valid"); // Status code: 400
         }
 
         // DELETE: api/Users/5
         //[AllowAnonymous]
-        [Authorize(Roles = "SuperAdmin")]
-        [HttpDelete("{id}")]
         //[Authorize(Roles = "SuperAdmin")]
-
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await _user.GetUserbyId(id);
