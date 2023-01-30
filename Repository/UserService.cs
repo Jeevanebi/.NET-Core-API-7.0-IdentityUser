@@ -131,17 +131,17 @@ namespace WebService.API.Services
                 if (findUser != null)
                 {
 
-                    var updateUser = new IdentityUser
-                    {
-                        UserName = user.Username,
-                        Email = user.Email,
-                        PhoneNumber = user.PhoneNo
-                    };
                     try
                     {
                         /*context.Users.Add(findUser.)*/
-                        await _userManager.UpdateAsync(updateUser);
-                        var updatedUser = await _userManager.FindByIdAsync(id);
+                        var updateUser = new IdentityUser
+                        {
+                            UserName = user.Username,
+                            Email = user.Email,
+                            PhoneNumber = user.PhoneNo
+                        };
+                        var up = await _userManager.UpdateAsync(updateUser);
+                        var updatedUser = await _userManager.FindByIdAsync(updateUser.Id);
                         var updatedUserResponse = new IdentityUser
                         {
                             Id = id,
