@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using WebService.API.Data;
+using WebService.API.Properties;
 using WebService.API.Repository;
 using WebService.API.Services;
 
@@ -33,6 +35,7 @@ internal class Program
 
         }).AddEntityFrameworkStores<IdentityUserContext>()
         .AddDefaultTokenProviders();
+        builder.Services.Configure<MailSettings>(_config.GetSection("MailSettings"));
 
         //Registering Interface
         builder.Services.AddScoped<IAuthService, AuthService>();

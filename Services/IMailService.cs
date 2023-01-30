@@ -1,7 +1,12 @@
-﻿namespace WebService.API.Services
+﻿using AutoMapper.Internal;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using WebService.API.Helpers;
+
+namespace WebService.API.Services
 {
     public interface IMailService
     {
-        Task SendEmailAsync(string toEmail, string subject, string content);
+        Task SendEmailAsync(MailRequest mailRequest);
     }
 }

@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using WebService.API.Entity;
+using WebService.API.Helpers;
 using WebService.API.Models;
 using WebService.API.Models.AuthModels;
+using WebService.API.Models.UserModels;
 using WebService.API.Services;
 
 namespace WebService.API.Controllers
@@ -26,8 +30,6 @@ namespace WebService.API.Controllers
         }
 
         // api/auth/Register
-
-        [AllowAnonymous]
         [HttpPost("Register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterUser model)
         {
@@ -45,9 +47,7 @@ namespace WebService.API.Controllers
         }
 
         // api/auth/Authenticate
-        [AllowAnonymous]
-        [HttpPost]
-        [Route("Authenticate")]
+        [HttpPost("Authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] AuthUser model)
         {
             if (ModelState.IsValid)
@@ -56,8 +56,20 @@ namespace WebService.API.Controllers
 
                 if (result.IsSuccess)
                 {
-                    await _mailService.SendEmailAsync(model.Email, "New login", "<h1>Hey!, new login to your account noticed</h1><p>New login to your account at " + DateTime.Now + "</p>");
-                    return Ok(result);
+                    var sub = "Detected - New login for "+model.Email;
+                    var content = "<h1>Hey "+model.UserName +"!, new login to your account noticed</h1><p>New login to your account at " + DateTime.Now +  "</p><strong>Your Login token : </strong><code> "+ result.Message + "</code><p>Expires :  "+DateTime.Now.AddHours(24);
+                    var mailContent = new MailRequest
+                    {
+                        ToEmail= model.Email,
+                        Subject =  sub,
+                        Body= content
+                    };
+                    await _mailService.SendEmailAsync(mailContent);
+                    return Ok(new UserResponseManager
+                    {
+                        IsSuccess= true,
+                        Message = "We have sent you the Login Token to your registered Mail : "+model.Email+", Please use the token to access!"
+                    });
                 }
 
                 return BadRequest(result);
@@ -65,7 +77,7 @@ namespace WebService.API.Controllers
             return BadRequest("Some properties are not valid");
         }
 
-        // /api/auth/confirmemail?userid&token
+        // /api/auth/ConfirmEmail?userid&token
         [HttpGet("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
@@ -76,13 +88,13 @@ namespace WebService.API.Controllers
 
             if (result.IsSuccess)
             {
-                return Redirect($"{_config["AppUrl"]}/ConfirmEmail.html");
+                return Content("Email Verified Successfully!");
             }
 
             return BadRequest(result);
         }
 
-        // api/auth/forgetpassword
+        // api/auth/ForgetPassword
         [HttpPost("ForgetPassword")]
         public async Task<IActionResult> ForgetPassword(string email)
         {
@@ -97,10 +109,12 @@ namespace WebService.API.Controllers
             return BadRequest(result); // 400
         }
 
-        // api/auth/resetpassword
+        // api/auth/ResetPassword
         [HttpPost("ResetPassword")]
-        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordModel model)
+        //[Description("This Method will not work in Swagger, Check your Registered Mail to get the Request link, Make a request using PostMan or any API Testing Tools with the Request Link")]
+        public async Task<IActionResult> ResetPassword([FromQuery]ResetPasswordModel model)
         {
+            
             if (ModelState.IsValid)
             {
                 var result = await _auth.ResetPassword(model);

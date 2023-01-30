@@ -8,6 +8,6 @@ namespace WebService.API.Models.UserModels
         public bool IsSuccess { get; set; }
         public dynamic?  Message { get; set; }
         public IEnumerable<dynamic>? Errors { get; set; }
-        public DateTime ExpireDate { get; set; }
+        
     }
 }

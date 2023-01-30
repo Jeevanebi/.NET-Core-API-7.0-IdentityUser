@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebService.API.Data;
-using WebService.API.Entity;
 using WebService.API.Models;
 using WebService.API.Models.UserModels;
 using WebService.API.Repository;
@@ -25,19 +22,19 @@ namespace WebService.API.Controllers
         }
 
         // GET: api/Users
-
         [HttpGet]
-        //[Authorize(Roles = "SuperAdmin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "SuperAdmin")]
+        //[AllowAnonymous]
         public async Task<IActionResult> GetUsers() 
         {
             var AllUser = await _user.GetUsers();
             return Ok(AllUser);
         }
-        [AllowAnonymous]
+
+        //[AllowAnonymous]
         // GET: api/Users/5
         [HttpGet("{id}")]
-        //[Authorize(Roles = "SuperAdmin, Admin, Agent")]
+        [Authorize(Roles = "SuperAdmin, Admin, Agent")]
         public async Task<IActionResult> GetUserbyId(string id)
         {
             var userById = await _user.GetUserbyId(id);
@@ -50,8 +47,9 @@ namespace WebService.API.Controllers
             return Ok(userById);
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         // PUT: api/Users/5
+        [Authorize(Roles = "SuperAdmin, Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, UpdateUser user)
         {
@@ -79,7 +77,8 @@ namespace WebService.API.Controllers
         }
 
         // DELETE: api/Users/5
-        [AllowAnonymous]
+        //[AllowAnonymous]
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("{id}")]
         //[Authorize(Roles = "SuperAdmin")]
 
