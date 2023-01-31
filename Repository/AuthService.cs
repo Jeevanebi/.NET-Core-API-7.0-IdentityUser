@@ -239,12 +239,13 @@ namespace WebService.API.Repository
             //var userRole =  await _roleManager.GetRoleIdAsync(user)
 
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
-                //new Claim(ClaimTypes.Role, userRole.)
             };
+
+            claims.AddRange(userRole.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var tokenClaims = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
