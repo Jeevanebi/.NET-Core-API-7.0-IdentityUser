@@ -107,9 +107,9 @@ namespace WebService.API.Repository
                     };
 
 
-                //var UserRoleId = await _roleManager.GetRoleIdAsync(user.Id);
+                var userRole = new List<string>(await _userManager.GetRolesAsync(user));
                 //Generate Token JWT
-                var Token = await GenerateToken(user);
+                var Token = await GenerateToken(user, userRole);
 
                 return new UserResponseManager
                 {
@@ -231,7 +231,7 @@ namespace WebService.API.Repository
         }
 
         //Token Genereator
-        private async Task<string> GenerateToken(IdentityUser user)
+        private async Task<string> GenerateToken(IdentityUser user, List<string> userRole)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -239,12 +239,13 @@ namespace WebService.API.Repository
             //var userRole =  await _roleManager.GetRoleIdAsync(user)
 
 
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
-                //new Claim(ClaimTypes.Role, userRole.)
             };
+
+            claims.AddRange(userRole.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
 
             var tokenClaims = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
