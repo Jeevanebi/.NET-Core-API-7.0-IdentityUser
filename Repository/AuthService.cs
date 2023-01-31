@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -90,11 +88,11 @@ namespace WebService.API.Repository
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             
-            if (user == null)
+            if (user.Email != model.Email || user.UserName != model.UserName)
             {
                 return new UserResponseManager
                 {
-                    Message = "There is no user with that Email address",
+                    Message = "There is no user with that Email address / Username! ",
                     IsSuccess = false,
                 };
             }
@@ -108,8 +106,11 @@ namespace WebService.API.Repository
                         IsSuccess = false,
                     };
 
-                var userRole = await _roleManager.FindByIdAsync(user.Id);
-                var Token = GenerateToken(user, "Admin" , user.Id);
+
+                //var UserRoleId = await _roleManager.GetRoleIdAsync(user.Id);
+                //Generate Token JWT
+                var Token = await GenerateToken(user);
+
                 return new UserResponseManager
                 {
                     Message = Token,
@@ -117,14 +118,6 @@ namespace WebService.API.Repository
                 };
             }
 
-            //Finding User Role 
-          
-            //var tokenClaims = new
-            //{
-            //    User = user,
-            //    UserRole = userRole
-                
-            //};
         }
 
         //ConfirmEmail
@@ -238,16 +231,19 @@ namespace WebService.API.Repository
         }
 
         //Token Genereator
-        private string GenerateToken(IdentityUser user,string userRole, string id)
+        private async Task<string> GenerateToken(IdentityUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            //var userRole =  await _roleManager.GetRoleIdAsync(user)
+
+
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, id),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, userRole)
+                //new Claim(ClaimTypes.Role, userRole.)
             };
 
             var tokenClaims = new JwtSecurityToken(_config["Jwt:Issuer"],
