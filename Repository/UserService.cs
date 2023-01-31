@@ -87,15 +87,24 @@ namespace WebService.API.Services
                 {
                     var result = await _userManager.CreateAsync(identityUser, model.Password);
 
+                    //Setting Roles
+                    if (model.Role != null)
+                    {
+                        var roleCheck = await _roleManager.RoleExistsAsync(model.Role);
+                        if (roleCheck != true)
+                        {
+                            await _userManager.AddToRoleAsync(identityUser, Convert.ToString("Guest"));
+                        }
+                        else
+                        {
+                            await _userManager.AddToRoleAsync(identityUser, Convert.ToString(model.Role));
+                        }
 
-                    //    //if (model.Role != null)
-                    //    //{
-                    //    //    await _userManager.AddToRoleAsync(identityUser, Convert.ToString(model.Role));
-                    //    //}
-                    //    //else
-                    //    //{
-                    //    //    await _userManager.AddToRoleAsync(identityUser, Convert.ToString("Guest"));
-                    //    //}
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(identityUser, Convert.ToString("Guest"));
+                    }
 
                     return new UserResponseManager
                     {
@@ -136,11 +145,12 @@ namespace WebService.API.Services
                         /*context.Users.Add(findUser.)*/
                         var updateUser = new IdentityUser
                         {
+                            Id= id,
                             UserName = user.Username,
                             Email = user.Email,
                             PhoneNumber = user.PhoneNo
                         };
-                        var up = await _userManager.UpdateAsync(updateUser);
+                        var up =  _userManager.UpdateAsync(updateUser);
                         var updatedUser = await _userManager.FindByIdAsync(updateUser.Id);
                         var updatedUserResponse = new IdentityUser
                         {
