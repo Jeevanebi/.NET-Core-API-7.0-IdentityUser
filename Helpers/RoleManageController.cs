@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +15,15 @@ namespace WebService.API.Helpers
     public class RoleManageController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        public RoleManageController(RoleManager<IdentityRole> roleManager)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public RoleManageController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _roleManager = roleManager;
+            _userManager = userManager;
         }
+
+   
 
         // /api/Roles
         [Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles ="SuperAdmin,Admin")]
@@ -47,6 +53,28 @@ namespace WebService.API.Helpers
                 IsSuccess = true,
                 Message = "Role " + roleName + " has been added to Role Manager!"
             });
+        }
+
+        // /api/AddUserRole/{RoleName}
+        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
+        [AllowAnonymous]
+        [HttpPost("AddUserRole")]
+        public async Task<IActionResult> AddUserRole(string id, string roles)
+        {
+            var existingUser = await _userManager.FindByIdAsync(id);
+            if (roles != null)
+            {
+                
+                //foreach(var i in roles.userRoles)
+                //{
+                    await _userManager.AddToRoleAsync(existingUser, roles);
+                //}
+                //await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
+            }
+
+            var addedRoles = await _userManager.GetRolesAsync(existingUser);
+
+            return Ok(addedRoles);
         }
 
     }
