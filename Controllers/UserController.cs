@@ -10,7 +10,7 @@ namespace WebService.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+   // [Authorize(AuthenticationSchemes = "Bearer")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _user;
@@ -26,7 +26,7 @@ namespace WebService.API.Controllers
 
         // GET: api/Users
         [HttpGet]
-        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         //[AllowAnonymous]
         public async Task<IActionResult> GetUsers() 
         {
@@ -37,7 +37,7 @@ namespace WebService.API.Controllers
         //[AllowAnonymous]
         // GET: api/Users/5
         [HttpGet("{id}")]
-        //[Authorize(Roles = "SuperAdmin, Admin, Agent")]
+        [Authorize(Roles = "SuperAdmin, Admin, AgentAdmin, Agent")]
         public async Task<IActionResult> GetUserbyId(string id)
         {
             var userById = await _user.GetUserbyId(id);
@@ -52,7 +52,7 @@ namespace WebService.API.Controllers
 
         //[AllowAnonymous]
         // PUT: api/Users/5
-        //[Authorize(Roles = "SuperAdmin, Admin")]
+        [Authorize(Roles = "SuperAdmin, Admin, AgentAdmin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, UpdateUser user)
         {
@@ -89,7 +89,7 @@ namespace WebService.API.Controllers
 
         // DELETE: api/Users/5
         //[AllowAnonymous]
-        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {

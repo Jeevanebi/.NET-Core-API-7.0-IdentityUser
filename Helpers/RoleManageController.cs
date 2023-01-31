@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebService.API.Models.UserModels;
@@ -7,8 +8,9 @@ using WebService.API.Models.UserModels;
 
 namespace WebService.API.Helpers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class RoleManageController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -17,7 +19,8 @@ namespace WebService.API.Helpers
             _roleManager = roleManager;
         }
 
-        // /api/Rolemanager/Roles
+        // /api/Roles
+        [Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles ="SuperAdmin,Admin")]
         [HttpGet("Roles")]
         public async Task<IActionResult> Index()
         {
@@ -30,7 +33,8 @@ namespace WebService.API.Helpers
         }
 
 
-        // /api/Rolemanager/Roles
+        // /api/Roles/{RoleName}
+        [Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
         [HttpPost("AddRole/{roleName}")]
         public async Task<IActionResult> AddRole(string roleName)
         {
