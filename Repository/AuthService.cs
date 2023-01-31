@@ -236,7 +236,7 @@ namespace WebService.API.Repository
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            //var userRole =  await _roleManager.GetRoleIdAsync(user)
+            var userRole = await _userManager.GetRolesAsync(user);
 
 
             var claims = new List<Claim>
