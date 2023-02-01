@@ -12,12 +12,12 @@ namespace WebService.API.Helpers
     [Route("api")]
     [ApiController]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public class RoleManageController : ControllerBase
+    public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public RoleManageController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
@@ -38,6 +38,20 @@ namespace WebService.API.Helpers
             });
         }
 
+        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
+        [AllowAnonymous]
+        [HttpGet("userRoles/{userId}")]
+        public async Task<IActionResult> GetUserRolebyId(string userId)
+        {
+            var existingUser = await _userManager.FindByIdAsync(userId);
+            if (existingUser != null)
+            {
+                var roles = await _userManager.GetRolesAsync(existingUser);
+                return Ok(roles);
+            };
+            return BadRequest("User not found!");
+            
+        }
 
         // /api/Roles/{RoleName}
         [Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
@@ -59,21 +73,39 @@ namespace WebService.API.Helpers
         //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
         [AllowAnonymous]
         [HttpPost("AddUserRole")]
-        public async Task<IActionResult> AddUserRole(string id, string roles)
+        public async Task<IActionResult> AddUserRole(string userId, string userRole)
         {
-            var existingUser = await _userManager.FindByIdAsync(id);
-            if (roles != null)
+            var existingUser = await _userManager.FindByIdAsync(userId);
+            if (userRole != null)
             {
-                if (await _roleManager.RoleExistsAsync(roles)) {
-                    await _userManager.AddToRoleAsync(existingUser, roles);
+                if (await _roleManager.RoleExistsAsync(userRole)) {
+                    await _userManager.AddToRoleAsync(existingUser, userRole);
                     var addedRoles = await _userManager.GetRolesAsync(existingUser);
                     return Ok(addedRoles);
                 };
                 return BadRequest("Role does not exits!"); 
             }
             return NotFound("Please fill the required fields ! ");
-;
         }
+
+        [AllowAnonymous]
+        [HttpPost("RemoveUserRole")]
+        public async Task<IActionResult> RemoveUserRole(string userId, string userRole)
+        {
+            var existingUser = await _userManager.FindByIdAsync(userId);
+            if (userRole != null)
+            {
+                if (await _roleManager.RoleExistsAsync(userRole))
+                {
+                    await _userManager.RemoveFromRoleAsync(existingUser, userRole);
+                    var addedRoles = await _userManager.GetRolesAsync(existingUser);
+                    return Ok(addedRoles);
+                };
+                return BadRequest("Role does not exits!");
+            }
+            return NotFound("Please fill the required fields ! ");
+        }
+
 
     }
 }
