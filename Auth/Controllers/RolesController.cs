@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebService.API.Authorization;
 using WebService.API.Models.UserModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace WebService.API.Authorization
+namespace WebService.API.Auth.Controllers
 {
     [Route("api")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer",Roles ="SuperAdmin, Admin")]
+    //[Authorize(AuthenticationSchemes = "Bearer"/*, Roles = "SuperAdmin, Admin"*/)]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -40,8 +41,9 @@ namespace WebService.API.Authorization
         }
 
         //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
-        [Authorize(Permissions.Users.View)]
+ 
         [HttpGet("userRoles/{userId}")]
+        [Authorize(Permissions.Users.View)]
         public async Task<IActionResult> GetUserRolebyId(string userId)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);
