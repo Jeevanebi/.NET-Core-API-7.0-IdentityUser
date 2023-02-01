@@ -20,7 +20,7 @@ namespace WebService.API.Authorization
         {
             if (context.User == null)
             {
-                return;
+                return ;
             }
 
             // Get all the roles the user belongs to and check if any of the roles has the permission required
