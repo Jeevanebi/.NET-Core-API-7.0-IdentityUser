@@ -7,11 +7,11 @@ using WebService.API.Models.UserModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace WebService.API.Helpers
+namespace WebService.API.Authorization
 {
     [Route("api")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer",Roles ="SuperAdmin, Admin")]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -23,10 +23,11 @@ namespace WebService.API.Helpers
             _userManager = userManager;
         }
 
-   
+
 
         // /api/Roles
-        [Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles ="SuperAdmin,Admin")]
+        //[Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles = "SuperAdmin,Admin,")]
+        [Authorize(Permissions.Users.View)]
         [HttpGet("Roles")]
         public async Task<IActionResult> Index()
         {
@@ -39,7 +40,7 @@ namespace WebService.API.Helpers
         }
 
         //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
-        [AllowAnonymous]
+        [Authorize(Permissions.Users.View)]
         [HttpGet("userRoles/{userId}")]
         public async Task<IActionResult> GetUserRolebyId(string userId)
         {
@@ -50,11 +51,12 @@ namespace WebService.API.Helpers
                 return Ok(roles);
             };
             return BadRequest("User not found!");
-            
+
         }
 
         // /api/Roles/{RoleName}
-        [Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
+        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
+        [Authorize(Permissions.Users.Create)]
         [HttpPost("AddRole/{roleName}")]
         public async Task<IActionResult> AddRole(string roleName)
         {
@@ -71,24 +73,25 @@ namespace WebService.API.Helpers
 
         // /api/AddUserRole/{RoleName}
         //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
-        [AllowAnonymous]
+        [Authorize(Permissions.Users.Create)]
         [HttpPost("AddUserRole")]
         public async Task<IActionResult> AddUserRole(string userId, string userRole)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);
             if (userRole != null)
             {
-                if (await _roleManager.RoleExistsAsync(userRole)) {
+                if (await _roleManager.RoleExistsAsync(userRole))
+                {
                     await _userManager.AddToRoleAsync(existingUser, userRole);
                     var addedRoles = await _userManager.GetRolesAsync(existingUser);
                     return Ok(addedRoles);
                 };
-                return BadRequest("Role does not exits!"); 
+                return BadRequest("Role does not exits!");
             }
             return NotFound("Please fill the required fields ! ");
         }
 
-        [AllowAnonymous]
+        [Authorize(Permissions.Users.Create)]
         [HttpPost("RemoveUserRole")]
         public async Task<IActionResult> RemoveUserRole(string userId, string userRole)
         {
