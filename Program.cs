@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WebService.API.Authorization;
 using WebService.API.Data;
 using WebService.API.Properties;
 using WebService.API.Repository;
@@ -24,6 +26,10 @@ internal class Program
         ////Normal User DbContext For Testing(SQL SERVER)
         //builder.Services.AddDbContext<ApplicationDbContext>();
         //Identity User DbContext for Production(SQL SERVER)
+
+
+        builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
         builder.Services.AddDbContext<IdentityUserContext>();
 
         //Registering Identity 
@@ -35,6 +41,8 @@ internal class Program
 
         }).AddEntityFrameworkStores<IdentityUserContext>()
         .AddDefaultTokenProviders();
+
+        //Registering Mail Service
         builder.Services.Configure<MailSettings>(_config.GetSection("MailSettings"));
 
         //Registering Interface
@@ -76,7 +84,7 @@ internal class Program
             });
         });
 
-        //Auth
+        //Authentication
         builder.Services.AddAuthentication(x =>
         {
             x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -95,6 +103,21 @@ internal class Program
                 ValidAudience = _config["Jwt:Issuer"],     // Jwt:Issuer - config value 
                 IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_config["Jwt:Key"])) // Jwt:Key - config value 
             };
+        });
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy(Permissions.Users.View, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.View));
+            });
+
+            options.AddPolicy(Permissions.Users.Create, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.Create));
+            });
+
+            // The rest omitted for brevity.
         });
 
 
