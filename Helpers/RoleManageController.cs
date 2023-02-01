@@ -64,17 +64,15 @@ namespace WebService.API.Helpers
             var existingUser = await _userManager.FindByIdAsync(id);
             if (roles != null)
             {
-                
-                //foreach(var i in roles.userRoles)
-                //{
+                if (await _roleManager.RoleExistsAsync(roles)) {
                     await _userManager.AddToRoleAsync(existingUser, roles);
-                //}
-                //await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
+                    var addedRoles = await _userManager.GetRolesAsync(existingUser);
+                    return Ok(addedRoles);
+                };
+                return BadRequest("Role does not exits!"); 
             }
-
-            var addedRoles = await _userManager.GetRolesAsync(existingUser);
-
-            return Ok(addedRoles);
+            return NotFound("Please fill the required fields ! ");
+;
         }
 
     }
