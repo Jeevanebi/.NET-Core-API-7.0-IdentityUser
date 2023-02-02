@@ -33,10 +33,10 @@ namespace WebService.API.Services
         }
 
         //All Users
-        public async Task<UserResponseManager> GetUsers()
+        public async Task<ResponseManager> GetUsers()
         {
             var userAll = await _userManager.Users.ToListAsync();
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = true,
                 Message = userAll
@@ -44,10 +44,10 @@ namespace WebService.API.Services
         }
 
         //GetUserByID
-        public async Task<UserResponseManager> GetUserbyId(string id)
+        public async Task<ResponseManager> GetUserbyId(string id)
         {
             var userById = await _userManager.FindByIdAsync(id);
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = true,
                 Message = userById
@@ -55,13 +55,13 @@ namespace WebService.API.Services
         }
 
         //Create User
-        public async Task<UserResponseManager> CreateUser(RegisterUser model)
+        public async Task<ResponseManager> CreateUser(RegisterUser model)
         {
             if (model == null)
                 throw new NullReferenceException("Data provided is NULL");
 
             if (model.Password != model.ConfirmPassword)
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     Message = "Confirm password doesn't match the password",
                     IsSuccess = false,
@@ -106,7 +106,7 @@ namespace WebService.API.Services
                         await _userManager.AddToRoleAsync(identityUser, Convert.ToString("Guest"));
                     }
 
-                    return new UserResponseManager
+                    return new ResponseManager
                     {
                         IsSuccess = true,
                         Message = result
@@ -116,7 +116,7 @@ namespace WebService.API.Services
 
                 catch (DBConcurrencyException ex)
                 {
-                    return new UserResponseManager()
+                    return new ResponseManager()
                     {
                         IsSuccess = false,
                         Message = ex.Message
@@ -124,7 +124,7 @@ namespace WebService.API.Services
                 }
             }
             //- User Exist
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = false
             };
@@ -132,7 +132,7 @@ namespace WebService.API.Services
         }
 
         //Update User
-        public async Task<UserResponseManager> UpdateUser(string id, UpdateUser user)
+        public async Task<ResponseManager> UpdateUser(string id, UpdateUser user)
         {
             if (user != null)
             {
@@ -162,7 +162,7 @@ namespace WebService.API.Services
                             PhoneNumber = updatedUser.PhoneNumber,
 
                         };
-                        return new UserResponseManager
+                        return new ResponseManager
                         {
                             IsSuccess = true,
                             Message = updatedUserResponse
@@ -172,21 +172,21 @@ namespace WebService.API.Services
                     catch (Exception ex)
                     {
 
-                        return new UserResponseManager
+                        return new ResponseManager
                         {
                             IsSuccess = false,
                             Message = ex.Message
                         };
                     }
                 }
-                return new UserResponseManager()
+                return new ResponseManager()
                 {
                     IsSuccess = false,
                     Message = "User not found!"
                 };
 
             }
-            return new UserResponseManager()
+            return new ResponseManager()
             {
                 IsSuccess = false,
                 Message = "updating property should not null!"
@@ -195,14 +195,14 @@ namespace WebService.API.Services
         }
 
         //Delete User
-        public async Task<UserResponseManager> DeleteUser(string id)
+        public async Task<ResponseManager> DeleteUser(string id)
         {
             IdentityUser user = await _userManager.FindByIdAsync(id);
             try
             {
                 await _userManager.DeleteAsync(user);
 
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = true,
                     Message = " User " + id + " removed successfully!"
