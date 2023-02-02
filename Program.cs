@@ -120,6 +120,14 @@ internal class Program
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Create));
             });
+            options.AddPolicy(Permissions.Users.Edit, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.Edit));
+            });
+            options.AddPolicy(Permissions.Users.Delete, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.Delete));
+            });
 
         });
 
