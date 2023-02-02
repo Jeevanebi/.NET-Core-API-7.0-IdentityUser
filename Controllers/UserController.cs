@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebService.API.Authorization;
-using WebService.API.Models;
 using WebService.API.Models.UserModels;
 using WebService.API.Repository;
 using WebService.API.Services;
@@ -11,7 +10,7 @@ namespace WebService.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   // [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _user;

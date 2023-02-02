@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using WebService.API.Enums;
 
-namespace WebService.API.Models
+namespace WebService.API.Models.UserModels
 {
     public class RegisterUser
     {
@@ -29,5 +29,5 @@ namespace WebService.API.Models
         [Required]
         public string Role { get; set; }
     }
-    
+
 }

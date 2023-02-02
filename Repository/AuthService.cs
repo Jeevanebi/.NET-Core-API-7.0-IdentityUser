@@ -34,7 +34,7 @@ namespace WebService.API.Repository
         }
 
         //Register User
-        public async Task<UserResponseManager> RegisterUser(RegisterUser model)
+        public async Task<ResponseManager> RegisterUser(RegisterUser model)
         {
         
             var identityUser = new IdentityUser
@@ -68,14 +68,14 @@ namespace WebService.API.Repository
 
                 await _mailService.SendEmailAsync(mailContent);
 
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = true,
                     Message = "User created successfully! Please confirm the your Email!",
                 };
             }
 
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = false,
                 Message = "User Email Already Registered, Try Login(/api/auth/Authenticate)"
@@ -84,13 +84,13 @@ namespace WebService.API.Repository
         }
 
         //Login User
-        public async Task<UserResponseManager> LoginUser(AuthUser model)
+        public async Task<ResponseManager> LoginUser(AuthUser model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             
             if (user.Email != model.Email || user.UserName != model.UserName)
             {
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     Message = "There is no user with that Email address / Username! ",
                     IsSuccess = false,
@@ -100,7 +100,7 @@ namespace WebService.API.Repository
             {
                 var result = await _userManager.CheckPasswordAsync(user, model.Password);
                 if (!result)
-                    return new UserResponseManager
+                    return new ResponseManager
                     {
                         Message = "Invalid password",
                         IsSuccess = false,
@@ -111,7 +111,7 @@ namespace WebService.API.Repository
                 //Generate Token JWT
                 var Token = await GenerateToken(user);
 
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     Message = Token,
                     IsSuccess = true,
@@ -121,12 +121,12 @@ namespace WebService.API.Repository
         }
 
         //ConfirmEmail
-        public async Task<UserResponseManager> ConfirmEmail(string userId, string token)
+        public async Task<ResponseManager> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = false,
                     Message = "User not found"
@@ -143,14 +143,14 @@ namespace WebService.API.Repository
                 user.EmailConfirmed = true;
                 await _userManager.UpdateAsync(user);
 
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     Message = "Email confirmed successfully!",
                     IsSuccess = true,
                 };
             }
 
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = false,
                 Message = "Email did not confirm",
@@ -159,11 +159,11 @@ namespace WebService.API.Repository
         }
 
         //Forget Password
-        public async Task<UserResponseManager> ForgetPassword(string email)
+        public async Task<ResponseManager> ForgetPassword(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = false,
                     Message = "No user associated with email",
@@ -185,7 +185,7 @@ namespace WebService.API.Repository
 
             await _mailService.SendEmailAsync(mailContent);
 
-            return new UserResponseManager
+            return new ResponseManager
             {
                 IsSuccess = true,
                 Message = "Reset password URL has been sent to the email successfully!"
@@ -193,18 +193,18 @@ namespace WebService.API.Repository
         }
 
         //Reset Password
-        public async Task<UserResponseManager> ResetPassword(ResetPasswordModel model)
+        public async Task<ResponseManager> ResetPassword(ResetPasswordModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = false,
                     Message = "No user associated with email",
                 };
 
             if (model.NewPassword != model.ConfirmPassword)
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     IsSuccess = false,
                     Message = "Password doesn't match its confirmation",
@@ -216,13 +216,13 @@ namespace WebService.API.Repository
             var result = await _userManager.ResetPasswordAsync(user, normalToken, model.NewPassword);
 
             if (result.Succeeded)
-                return new UserResponseManager
+                return new ResponseManager
                 {
                     Message = "Password has been reset successfully!",
                     IsSuccess = true,
                 };
 
-            return new UserResponseManager
+            return new ResponseManager
             {
                 Message = "Something went wrong",
                 IsSuccess = false,

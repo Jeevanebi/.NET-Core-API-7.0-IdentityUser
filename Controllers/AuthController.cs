@@ -65,7 +65,7 @@ namespace WebService.API.Controllers
                         Body= content
                     };
                     await _mailService.SendEmailAsync(mailContent);
-                    return Ok(new UserResponseManager
+                    return Ok(new ResponseManager
                     {
                         IsSuccess= true,
                         Message = "We have sent you the Login Token to your registered Mail : "+model.Email+", Please use the token to access!"

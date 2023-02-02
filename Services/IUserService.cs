@@ -7,12 +7,12 @@ namespace WebService.API.Repository
 {
     public interface IUserService
     {
-        Task<UserResponseManager> GetUsers();
-        Task<UserResponseManager> GetUserbyId(string id);
-        Task<UserResponseManager> CreateUser(RegisterUser model);
+        Task<ResponseManager> GetUsers();
+        Task<ResponseManager> GetUserbyId(string id);
+        Task<ResponseManager> CreateUser(RegisterUser model);
 
-        Task<UserResponseManager> UpdateUser(string id, UpdateUser user);
-        Task<UserResponseManager> DeleteUser(string id);
+        Task<ResponseManager> UpdateUser(string id, UpdateUser user);
+        Task<ResponseManager> DeleteUser(string id);
         public bool IsExist(string id);
 
     }

@@ -11,7 +11,7 @@ namespace WebService.API.Models.AuthModels
         public string Email { get; set; }
 
         [Required]
-public string Token { get; set; }
+        public string Token { get; set; }
 
         [Required]
         [StringLength(50, MinimumLength = 5)]
