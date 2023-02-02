@@ -28,7 +28,7 @@ namespace WebService.API.Auth.Controllers
 
         // /api/Roles
         //[Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles = "SuperAdmin,Admin,")]
-        [Authorize(Policy = "ViewPolicy")]
+        [Authorize(Permissions.Users.View)]
         [HttpGet("Roles")]
         public async Task<IActionResult> Index()
         {
@@ -93,8 +93,9 @@ namespace WebService.API.Auth.Controllers
             return NotFound("Please fill the required fields ! ");
         }
 
-        [Authorize(Permissions.Users.Create)]
+
         [HttpPost("RemoveUserRole")]
+        [Authorize(Permissions.Users.Create)]
         public async Task<IActionResult> RemoveUserRole(string userId, string userRole)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);
