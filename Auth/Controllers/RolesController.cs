@@ -28,7 +28,7 @@ namespace WebService.API.Auth.Controllers
 
         // /api/Roles
         //[Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles = "SuperAdmin,Admin,")]
-        [Authorize(Permissions.Users.View)]
+        [Authorize(Policy = "ViewPolicy")]
         [HttpGet("Roles")]
         public async Task<IActionResult> Index()
         {

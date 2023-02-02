@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using WebService.API.Auth;
+using WebService.API.Auth.Controllers;
 using WebService.API.Authorization;
 using WebService.API.Data;
 using WebService.API.Properties;
@@ -29,6 +31,7 @@ internal class Program
 
 
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
         builder.Services.AddDbContext<IdentityUserContext>();
 
@@ -107,17 +110,16 @@ internal class Program
 
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy(Permissions.Users.View, builder =>
+            options.AddPolicy("ViewPolicy", builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.View));
             });
 
-            options.AddPolicy(Permissions.Users.Create, builder =>
+            options.AddPolicy("CreatePolicy", builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Create));
             });
 
-            // The rest omitted for brevity.
         });
 
 
