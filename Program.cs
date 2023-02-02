@@ -31,7 +31,7 @@ internal class Program
 
 
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
-        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        //builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
         builder.Services.AddDbContext<IdentityUserContext>();
 
@@ -108,14 +108,15 @@ internal class Program
             };
         });
 
+        //Authorization
         builder.Services.AddAuthorization(options =>
         {
-            options.AddPolicy("ViewPolicy", builder =>
+            options.AddPolicy(Permissions.Users.View, builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.View));
             });
 
-            options.AddPolicy("CreatePolicy", builder =>
+            options.AddPolicy(Permissions.Users.Create, builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Create));
             });

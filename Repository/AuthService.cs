@@ -109,7 +109,7 @@ namespace WebService.API.Repository
 
                 var userRole = new List<string>(await _userManager.GetRolesAsync(user));
                 //Generate Token JWT
-                var Token = await GenerateToken(user, userRole);
+                var Token = await GenerateToken(user);
 
                 return new UserResponseManager
                 {
@@ -231,23 +231,29 @@ namespace WebService.API.Repository
         }
 
         //Token Genereator
-        private async Task<string> GenerateToken(IdentityUser user, List<string> userRole)
+        private async Task<string> GenerateToken(IdentityUser user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
 
+            var userRoles = roles.Select(r => new Claim(ClaimTypes.Role, r)).ToArray();
 
-            var claims = new List<Claim>
+            var userClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+
+            var roleClaims = await _userManager.GetClaimsAsync(user).ConfigureAwait(false);
+
+            var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.UserName)
 
-            };
+            }.Union(userClaims).Union(roleClaims).Union(userRoles);
 
-            claims.AddRange(userRole.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
-          
+            //claims.AddRange(userRole.Select(role => new Claim(ClaimsIdentity.DefaultRoleClaimType, role)));
+
             var tokenClaims = new JwtSecurityToken(_config["Jwt:Issuer"],
                 _config["Jwt:Audience"],
                 claims,
