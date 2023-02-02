@@ -9,9 +9,9 @@ namespace WebService.API.Helpers
     {
         public AutoMapperProfile()
         {
-            CreateMap<User, UserResponseManager>();
-            CreateMap<RegisterUser, UserResponseManager>();
-            CreateMap<UpdateUser, UserResponseManager>();
+            CreateMap<User, ResponseManager>();
+            CreateMap<RegisterUser, ResponseManager>();
+            CreateMap<UpdateUser, ResponseManager>();
         }
         
     }

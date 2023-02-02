@@ -8,14 +8,14 @@ namespace WebService.API.Services
     public interface IAuthService
     {
 
-        Task<UserResponseManager> RegisterUser(RegisterUser model);
+        Task<ResponseManager> RegisterUser(RegisterUser model);
 
-        Task<UserResponseManager> LoginUser(AuthUser model);
+        Task<ResponseManager> LoginUser(AuthUser model);
 
-        Task<UserResponseManager> ConfirmEmail(string userId, string token);
+        Task<ResponseManager> ConfirmEmail(string userId, string token);
 
-        Task<UserResponseManager> ForgetPassword(string email);
+        Task<ResponseManager> ForgetPassword(string email);
 
-        Task<UserResponseManager> ResetPassword(ResetPasswordModel model);
+        Task<ResponseManager> ResetPassword(ResetPasswordModel model);
     }
 }
