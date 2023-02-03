@@ -29,8 +29,9 @@ internal class Program
         //builder.Services.AddDbContext<ApplicationDbContext>();
         //Identity User DbContext for Production(SQL SERVER)
 
-
+        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
         builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
         //builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 
         builder.Services.AddDbContext<IdentityUserContext>();
@@ -120,15 +121,28 @@ internal class Program
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Create));
             });
+
             options.AddPolicy(Permissions.Users.Edit, builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Edit));
             });
+
             options.AddPolicy(Permissions.Users.Delete, builder =>
             {
                 builder.AddRequirements(new PermissionRequirement(Permissions.Users.Delete));
             });
-
+            options.AddPolicy(Permissions.Users.viewById, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.viewById));
+            });
+            options.AddPolicy(Permissions.Users.SuperAdminView, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.SuperAdminView));
+            });
+            options.AddPolicy(Permissions.Users.SuperAdminCreate, builder =>
+            {
+                builder.AddRequirements(new PermissionRequirement(Permissions.Users.SuperAdminCreate));
+            });
         });
 
 

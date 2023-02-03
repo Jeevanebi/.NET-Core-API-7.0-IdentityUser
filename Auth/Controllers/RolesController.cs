@@ -12,7 +12,7 @@ namespace WebService.API.Auth.Controllers
 {
     [Route("api")]
     [ApiController]
-    //[Authorize(AuthenticationSchemes = "Bearer"/*, Roles = "SuperAdmin, Admin"*/)]
+    [Authorize(AuthenticationSchemes = "Bearer", Roles = "SuperAdmin, Admin")]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -27,9 +27,10 @@ namespace WebService.API.Auth.Controllers
 
 
         // /api/Roles
-        //[Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles = "SuperAdmin,Admin,")]
-        [Authorize(Permissions.Users.View)]
+
         [HttpGet("Roles")]
+        [Authorize(Permissions.Users.SuperAdminView)]
+        //[Authorize(AuthenticationSchemes = "Bearer",/* Policy = "SuperAdmin",*/ Roles = "SuperAdmin,Admin,")]
         public async Task<IActionResult> Index()
         {
             var roles = await _roleManager.Roles.ToListAsync();
@@ -40,10 +41,50 @@ namespace WebService.API.Auth.Controllers
             });
         }
 
+
+
+        // /api/Roles/{RoleName}
+
+        [HttpPost("AddRole/Role")]
+        [Authorize(Permissions.Users.SuperAdminCreate)]
         //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
- 
-        [HttpGet("userRoles/{userId}")]
-        [Authorize(Permissions.Users.View)]
+        public async Task<IActionResult> AddRole(string roleName)
+        {
+            if (roleName != null)
+            {
+                 var newRole = await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
+            }
+            return Ok(new UserResponseManager
+            {
+                IsSuccess = true,
+                Message = "Role '" + roleName + "' has been added to Role Manager!"
+            });
+        }
+
+
+        // /api/Roles/{RoleName}
+
+        [HttpDelete("removeRole/role")]
+        [Authorize(Permissions.Users.Delete)]
+        public async Task<IActionResult> RemoveRole(string roleName)
+        {
+            if (roleName != null)
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                var removeRole = await _roleManager.DeleteAsync(role);
+            }
+            return Ok(new UserResponseManager
+            {
+                IsSuccess = true,
+                Message = "Role '" + roleName + "' has been Removed from Role Manager!"
+            });
+        }
+
+        // /api/userRoles/{id}
+
+        [HttpGet("userRoles/userId")]
+        [Authorize(Permissions.Users.viewById)]
+        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
         public async Task<IActionResult> GetUserRolebyId(string userId)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);
@@ -56,27 +97,11 @@ namespace WebService.API.Auth.Controllers
 
         }
 
-        // /api/Roles/{RoleName}
-        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
-        [Authorize(Permissions.Users.Create)]
-        [HttpPost("AddRole/{roleName}")]
-        public async Task<IActionResult> AddRole(string roleName)
-        {
-            if (roleName != null)
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName.Trim()));
-            }
-            return Ok(new UserResponseManager
-            {
-                IsSuccess = true,
-                Message = "Role " + roleName + " has been added to Role Manager!"
-            });
-        }
-
         // /api/AddUserRole/{RoleName}
-        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
+
+        [HttpPost("AddUserRole/UserRole")]
         [Authorize(Permissions.Users.Create)]
-        [HttpPost("AddUserRole")]
+        //[Authorize(AuthenticationSchemes = "Bearer", /*Policy = "SuperAdmin",*/ Roles = "SuperAdmin")]
         public async Task<IActionResult> AddUserRole(string userId, string userRole)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);
@@ -93,9 +118,10 @@ namespace WebService.API.Auth.Controllers
             return NotFound("Please fill the required fields ! ");
         }
 
+        // /api/RemoveUserRole/{RoleName}
 
-        [HttpPost("RemoveUserRole")]
-        [Authorize(Permissions.Users.Create)]
+        [HttpDelete("RemoveUserRole/userRole")]
+        [Authorize(Permissions.Users.Edit)]
         public async Task<IActionResult> RemoveUserRole(string userId, string userRole)
         {
             var existingUser = await _userManager.FindByIdAsync(userId);

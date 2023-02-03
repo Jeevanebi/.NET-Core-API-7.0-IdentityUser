@@ -27,7 +27,7 @@ namespace WebService.API.Controllers
         // GET: api/Users
         [HttpGet]
         //[Authorize(Roles = "SuperAdmin,Admin")]
-        [Authorize(Permissions.Users.View)]
+        [Authorize(Permissions.Users.SuperAdminView)]
         //[AllowAnonymous]
         public async Task<IActionResult> GetUsers() 
         {
@@ -39,7 +39,7 @@ namespace WebService.API.Controllers
         // GET: api/Users/5
         [HttpGet("{id}")]
         //[Authorize(Roles = "SuperAdmin, Admin, Agent")]
-        [Authorize(Permissions.Users.View)]
+        [Authorize(Permissions.Users.viewById)]
         public async Task<IActionResult> GetUserbyId(string id)
         {
             var userById = await _user.GetUserbyId(id);
@@ -73,7 +73,7 @@ namespace WebService.API.Controllers
 
 
         // POST: api/Users
-        [AllowAnonymous]
+        [Authorize(Permissions.Users.Create)]
         //[Authorize(Permissions.Users.Create)]
         [HttpPost]
         public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
