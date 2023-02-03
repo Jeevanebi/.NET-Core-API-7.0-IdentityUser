@@ -6,6 +6,7 @@ using MimeKit;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using WebService.API.Helpers;
 using WebService.API.Properties;
@@ -48,11 +49,13 @@ namespace WebService.API.Repository
                     }
                 }
             }
+            var password = Encoding.UTF8.GetString(Convert.FromBase64String(_mailSettings.Password));
+
             builder.HtmlBody = mailRequest.Body;
             email.Body = builder.ToMessageBody();
             using var smtp = new SmtpClient();
             smtp.Connect(_mailSettings.Host, _mailSettings.Port, SecureSocketOptions.StartTls);
-            smtp.Authenticate(_mailSettings.Mail, _mailSettings.Password);
+            smtp.Authenticate(_mailSettings.Mail, password);
             await smtp.SendAsync(email);
             smtp.Disconnect(true);
             
