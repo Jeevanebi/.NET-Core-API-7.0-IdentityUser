@@ -1,9 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using WebService.API.Entity;
 using WebService.API.Helpers;
 using WebService.API.Models;
 using WebService.API.Models.AuthModels;

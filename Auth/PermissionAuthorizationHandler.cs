@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using WebService.API.Models;
 
 namespace WebService.API.Authorization
@@ -23,6 +22,7 @@ namespace WebService.API.Authorization
             if (context.User != null)
             {
                 // Get all the roles the user belongs to and check if any of the roles has the permission required
+
                 // for the authorization to succeed.
                 var user = await _userManager.GetUserAsync(context.User);
                 if (user != null)
