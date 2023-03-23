@@ -10,7 +10,6 @@ namespace WebService.API.Entity
     {
         public string? UserId { get; set; }
         public string? Username { get; set; }
-        public string? Email { get; set; }
         public string? PhoneNo { get; set; }
     }
 }

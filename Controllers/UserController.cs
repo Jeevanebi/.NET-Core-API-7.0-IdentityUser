@@ -72,24 +72,24 @@ namespace WebService.API.Controllers
         }
 
 
-        // POST: api/Users
-        [Authorize(Permissions.Users.Create)]
+        //// POST: api/Users
         //[Authorize(Permissions.Users.Create)]
-        [HttpPost]
-        public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
-        {
-            if (ModelState.IsValid)
-            {
-                var result = await _auth.RegisterUser(user);
+        ////[Authorize(Permissions.Users.Create)]
+        //[HttpPost]
+        //public async Task<IActionResult> PostUser([FromBody] RegisterUser user)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var result = await _auth.RegisterUser(user);
 
-                if (result.IsSuccess)
-                    return Ok(result); // Status Code: 200 
+        //        if (result.IsSuccess)
+        //            return Ok(result); // Status Code: 200 
 
-                return BadRequest(result);
-            }
+        //        return BadRequest(result);
+        //    }
 
-            return BadRequest("Some properties are not valid"); // Status code: 400
-        }
+        //    return BadRequest("Some properties are not valid"); // Status code: 400
+        //}
 
         // DELETE: api/Users/5
         //[AllowAnonymous]
