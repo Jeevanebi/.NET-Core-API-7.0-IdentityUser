@@ -112,7 +112,7 @@ namespace WebService.API.Repository
                 var Token = await GenerateToken(user);
 
                 return new ResponseManager
-                {
+                {   
                     Message = Token,
                     IsSuccess = true,
                 };
