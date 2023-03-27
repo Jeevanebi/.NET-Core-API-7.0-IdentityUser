@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebService.API.Models.AuthModels
 {
@@ -15,6 +18,7 @@ namespace WebService.API.Models.AuthModels
 
         [Required]
         [StringLength(50, MinimumLength = 5)]
+        [DataType(DataType.Password)]
         public string Password { get; set; }
 
     }

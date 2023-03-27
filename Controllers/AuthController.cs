@@ -29,7 +29,7 @@ namespace WebService.API.Controllers
 
         // api/auth/Register
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterUser model)
+        public async Task<IActionResult> RegisterAsync([FromForm] RegisterUser model)
         {
             if (ModelState.IsValid)
             {
@@ -46,7 +46,7 @@ namespace WebService.API.Controllers
 
         // api/auth/Authenticate
         [HttpPost("Authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] AuthUser model)
+        public async Task<IActionResult> Authenticate([FromForm] AuthUser model)
         {
             if (ModelState.IsValid)
             {
@@ -55,7 +55,7 @@ namespace WebService.API.Controllers
                 if (result.IsSuccess)
                 {
                     var sub = "Detected - New login for "+model.Email;
-                    var content = "<h1>Hey "+model.UserName +"!, new login to your account noticed</h1><p>New login to your account at " + DateTime.Now +  "</p><strong>Your Login token : </strong><code> "+ result.Message + "</code><p>Expires :  "+DateTime.Now.AddHours(24);
+                    var content = "<h1>Hey "+model.UserName +"!, new login to your account noticed</h1><p>New login to your account at <h2>" + DateTime.Now + "</h2><br></p><strong>Your Login token : </strong><code> "+ result.Message + "</code><p><br><h1>Expires :  "+DateTime.Now.AddHours(24)+"</h1>";
                     var mailContent = new MailRequest
                     {
                         ToEmail= model.Email,
@@ -66,7 +66,7 @@ namespace WebService.API.Controllers
                     return Ok(new ResponseManager
                     {
                         IsSuccess= true,
-                        Message = "We have sent you the Login Token to your registered Mail : "+model.Email+", Please use the token to access!"
+                        Message = "We have sent you the Login Token to your registered Mail : "+model.Email+", Please use the security token to access the API(Authorize)!"
                     });
                 }
 

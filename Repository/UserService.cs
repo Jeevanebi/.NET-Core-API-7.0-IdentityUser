@@ -47,10 +47,18 @@ namespace WebService.API.Services
         public async Task<ResponseManager> GetUserbyId(string id)
         {
             var userById = await _userManager.FindByIdAsync(id);
+            if (userById != null)
+            {
+                return new ResponseManager
+                {
+                    IsSuccess = true,
+                    Message = userById
+                };
+            };
             return new ResponseManager
             {
-                IsSuccess = true,
-                Message = userById
+                IsSuccess = false,
+                Message = "User Not found"
             };
         }
 
