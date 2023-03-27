@@ -55,7 +55,7 @@ namespace WebService.API.Controllers
                 if (result.IsSuccess)
                 {
                     var sub = "Detected - New login for "+model.Email;
-                    var content = "<h1>Hey "+model.UserName +"!, new login to your account noticed</h1><p>New login to your account at <h2>" + DateTime.Now + "</h2><br></p><strong>Your Login token : </strong><code> "+ result.Message + "</code><p><br><h1>Expires :  "+DateTime.Now.AddHours(24)+"</h1>";
+                    var content = "<h1>Hey "+model.UserName +"!<br> New login to your account noticed</h1><strong><p>New login to your account at <h2>" + DateTime.Now + "</h2><br></p></strong><strong>Your Login token : </strong><code> "+ result.Message + "</code><p><br><h1>Expires :  "+DateTime.Now.AddHours(24)+"</h1>";
                     var mailContent = new MailRequest
                     {
                         ToEmail= model.Email,

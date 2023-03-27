@@ -63,7 +63,7 @@ internal class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = ".NET-Core-UserManagement-API-7.0",
+                Title = "UserManagement-API (NetCore 7.0)",
                 Version = "v1"
             });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()

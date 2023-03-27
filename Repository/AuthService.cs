@@ -63,7 +63,7 @@ namespace WebService.API.Repository
                 {
                     ToEmail = identityUser.Email,
                     Subject = "Confirm your email",
-                    Body = $"<h1>Welcome to Identity Test API</h1>" + $"<p>Hi {identityUser.UserName} !, Please confirm your email by <a href='{url}'>Clicking here</a></p><br><strong>Email Confirmation token:<br><br> <h2>User Id  :"+confirmUser.Id+"</h2> <br> <h1>Token: <code>"+validEmailToken + "</code></strong></h1>"
+                    Body = $"<h1>Welcome to Identity UserManagement API</h1>" + $"<p>Hi {identityUser.UserName} !, Please confirm your email by <a href='{url}'>Clicking here</a></p><br><strong>Email Confirmation token:<br><br> <h2>User Id  :"+confirmUser.Id+"</h2> <br> <h1>Token: <code>"+validEmailToken + "</code></strong></h1>"
                 };
 
                 await _mailService.SendEmailAsync(mailContent);
